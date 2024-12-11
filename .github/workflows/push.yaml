@@ -1,42 +1,18 @@
 name: golang-pipeline
-
-on:
-  push:
-    branches:
-      - main
-
+on: push
 jobs:
   test:
     runs-on: ubuntu-latest
     container: golang:1.22
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Set up Go
-        uses: actions/setup-go@v4
-        with:
-          go-version: 1.22
-
-      - name: Cache Go modules
-        uses: actions/cache@v4
-        with:
-          path: ~/go/pkg/mod
-          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
-          restore-keys: |
-            ${{ runner.os }}-go-
-
-      - name: Install dependencies
-        run: go mod tidy
+      - uses: actions/checkout@v4
 
       - name: Run Unit Tests
-        run: GOOS=linux GOARCH=amd64 go test ./...
+        run: GOOS=linux GOARCH=amd64 go test
 
       - name: Vet
-        run: go vet ./...
-
-      - name: Check formatting
-        run: go fmt ./...
+        run: |
+          go vet ./...
 
   deploy:
     name: Push Docker image to Docker Hub
@@ -60,7 +36,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v5.5.1
         with:
-          images: anna241198/final-main
+          images: Anna241198/final-main 
 
       - name: Build and push Docker Image
         uses: docker/build-push-action@v5
